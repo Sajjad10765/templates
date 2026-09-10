@@ -60,13 +60,13 @@
     <h1>مكتبة القوالب والنماذج الرسمية</h1>
     <p class="desc">حمل أحدث النماذج، جداول الإكسل، وقوالب السيرة الذاتية مجاناً وبضغطة زر واحدة.</p>
 
-    <!-- 1. قسم إزالة الخلفية الذكية -->
-    <h2 class="section-title">1️⃣ إزالة الخلفية التلقائية (تتعرف على أي خلفية)</h2>
+    <!-- 1. قسم تحويل ملفات Word -->
+    <h2 class="section-title">1️⃣ تحويل ملفات Word (.docx) إلى PDF منسق</h2>
     <div class="tool-card">
-        <h3>ارفع صورتك وسيتم عزلها وتوليد صورة شفافة فوراً</h3>
-        <input type="file" id="bgImageInput" accept="image/*">
-        <button class="btn btn-success" onclick="removeImageBackgroundSmart()">إزالة الخلفية وتنزيل الصورة الشفافة</button>
-        <div id="bgResult" class="status-msg"></div>
+        <h3>الحفاظ على التنسيق الأصلي للمحتوى والفقرات دون تغيير</h3>
+        <input type="file" id="wordFileInput" accept=".docx">
+        <button class="btn" onclick="convertWordToPdfView()">معالجة وعرض الملف للطباعة (PDF)</button>
+        <div id="wordResult" class="status-msg"></div>
     </div>
 
     <!-- إعلان البانر الأول (الخاص بك - قياس 300x250) -->
@@ -83,17 +83,8 @@
         <script type="text/javascript" src="//www.highrevenueformat.com/03e2981f3a9b5f92f67cbb8ca2820343/invoke.js"></script>
     </div>
 
-    <!-- 2. قسم تحويل ملفات Word -->
-    <h2 class="section-title">2️⃣ تحويل ملفات Word (.docx) إلى PDF منسق</h2>
-    <div class="tool-card">
-        <h3>الحفاظ على التنسيق الأصلي للمحتوى والفقرات دون تغيير</h3>
-        <input type="file" id="wordFileInput" accept=".docx">
-        <button class="btn" onclick="convertWordToPdfView()">معالجة وعرض الملف للطباعة (PDF)</button>
-        <div id="wordResult" class="status-msg"></div>
-    </div>
-
-    <!-- 3. قسم تصاميم السير الذاتية الفريدة -->
-    <h2 class="section-title">3️⃣ مكتبة السير الذاتية الاحترافية (تصاميم مختلفة كلياً)</h2>
+    <!-- 2. قسم تصاميم السير الذاتية الفريدة -->
+    <h2 class="section-title">2️⃣ مكتبة السير الذاتية الاحترافية (تصاميم مختلفة كلياً)</h2>
     <p style="font-size: 13px; color: #64748b;">اختر النمط الفني الذي يعجبك، املأ بياناتك، واحفظه بصيغة PDF فوراً:</p>
     
     <div class="cv-grid">
@@ -134,8 +125,8 @@
         </div>
     </div>
 
-    <!-- 4. قسم جداول الإكسل -->
-    <h2 class="section-title">4️⃣ جداول الإكسل الاحترافية المتقدمة</h2>
+    <!-- 3. قسم جداول الإكسل -->
+    <h2 class="section-title">3️⃣ جداول الإكسل الاحترافية المتقدمة</h2>
     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; margin-top: 15px;">
         <div class="tool-card" style="margin:0; text-align:right;">
             <h4 style="margin:0 0 5px 0; color:#1e293b;">جدول رواتب وأجور العمال</h4>
@@ -197,81 +188,7 @@
 </div>
 
 <script>
-    /* 1. إزالة الخلفية الذكية */
-    function removeImageBackgroundSmart() {
-        const input = document.getElementById('bgImageInput');
-        const res = document.getElementById('bgResult');
-        if (input.files.length === 0) {
-            res.className = "status-msg error";
-            res.innerText = "يرجى اختيار صورة أولاً!";
-            return;
-        }
-        res.className = "status-msg loading";
-        res.innerText = "جاري تحليل أطراف الصورة وعزل الخلفية...";
-        
-        const file = input.files[0];
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const img = new Image();
-            img.onload = function() {
-                const canvas = document.createElement('canvas');
-                canvas.width = img.width;
-                canvas.height = img.height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0);
-                
-                const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                const data = imgData.data;
-                const width = canvas.width;
-                const height = canvas.height;
-                
-                const rBg = data[0], gBg = data[1], bBg = data[2];
-                const tolerance = 50; 
-                const visited = new Uint8Array(width * height);
-                const queue = [];
-                
-                for (let x = 0; x < width; x++) {
-                    queue.push(x);
-                    queue.push(x + (height - 1) * width);
-                }
-                for (let y = 0; y < height; y++) {
-                    queue.push(y * width);
-                    queue.push((width - 1) + y * width);
-                }
-                
-                while(queue.length > 0) {
-                    const idx = queue.pop();
-                    if (visited[idx]) continue;
-                    visited[idx] = 1;
-                    
-                    const i = idx * 4;
-                    const r = data[i], g = data[i+1], b = data[i+2];
-                    
-                    if (Math.abs(r - rBg) < tolerance && Math.abs(g - gBg) < tolerance && Math.abs(b - bBg) < tolerance) {
-                        data[i+3] = 0; 
-                        const x = idx % width;
-                        const y = Math.floor(idx / width);
-                        
-                        if (x > 0 && !visited[idx - 1]) queue.push(idx - 1);
-                        if (x < width - 1 && !visited[idx + 1]) queue.push(idx + 1);
-                        if (y > 0 && !visited[idx - width]) queue.push(idx - width);
-                        if (y < height - 1 && !visited[idx + width]) queue.push(idx + width);
-                    }
-                }
-                
-                ctx.putImageData(imgData, 0, 0);
-                canvas.toBlob(function(blob) {
-                    const url = URL.createObjectURL(blob);
-                    res.className = "status-msg success";
-                    res.innerHTML = `تمت إزالة الخلفية بنجاح! <br><a href="${url}" download="transparent-image.png" class="btn btn-success" style="margin-top:8px; display:inline-block;">تنزيل الصورة الشفافة فوراً</a>`;
-                }, 'image/png');
-            };
-            img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-    }
-
-    /* 2. تحويل ملف الورد */
+    /* 1. تحويل ملف الورد */
     function convertWordToPdfView() {
         const input = document.getElementById('wordFileInput');
         const res = document.getElementById('wordResult');
@@ -322,7 +239,7 @@
         reader.readAsArrayBuffer(file);
     }
 
-    /* 3. نافذة السير الذاتية */
+    /* 2. نافذة السير الذاتية */
     function openCvForm(templateId, title) {
         document.getElementById('cvTemplateId').value = templateId;
         document.getElementById('modalTitle').innerText = "تعبئة بيانات " + title;
@@ -436,7 +353,7 @@
         closeCvForm();
     }
 
-    /* 4. توليد جداول الإكسل */
+    /* 3. توليد جداول الإكسل */
     function downloadExcel(type) {
         let data = [];
         let filename = "";
@@ -485,4 +402,3 @@
 
 </body>
 </html>
-
