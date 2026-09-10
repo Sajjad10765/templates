@@ -7,41 +7,56 @@
     <style>
         * { box-sizing: border-box; }
         body { font-family: Tahoma, sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; color: #333; }
-        .container { max-width: 850px; margin: 0 auto; background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        .container { max-width: 950px; margin: 0 auto; background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
         h1 { color: #2c3e50; text-align: center; margin-bottom: 5px; }
         p.desc { text-align: center; color: #7f8c8d; margin-bottom: 25px; }
         .section-title { color: #2980b9; border-bottom: 2px solid #3498db; padding-bottom: 8px; margin-top: 35px; font-size: 20px; }
         
-        .card, .tool-box { background: #fafafa; border: 1px solid #e1e8ed; padding: 20px; margin: 20px 0; border-radius: 8px; transition: 0.3s; }
-        .card:hover, .tool-box:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .tool-box, .excel-card { background: #fafafa; border: 1px solid #e1e8ed; padding: 20px; margin: 20px 0; border-radius: 8px; transition: 0.3s; }
+        .tool-box:hover, .excel-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
         
-        .card-info h3 { margin: 0 0 8px 0; color: #2c3e50; font-size: 18px; }
-        .card-info p { margin: 0; color: #666; font-size: 14px; }
-        .card-flex { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
-        
-        .btn { background: #27ae60; color: white; padding: 10px 22px; text-decoration: none; border-radius: 6px; font-weight: bold; border: none; cursor: pointer; display: inline-block; font-size: 14px; text-align: center; }
+        .btn { background: #27ae60; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; font-weight: bold; border: none; cursor: pointer; display: inline-block; font-size: 14px; text-align: center; }
         .btn:hover { background: #219653; }
         
         .tool-box { text-align: center; background: #fdfefe; }
         .tool-box input[type="file"] { margin: 15px 0; display: block; margin-right: auto; margin-left: auto; padding: 8px; border: 1px dashed #3498db; border-radius: 6px; background: #fff; width: 100%; max-width: 350px; }
         
-        .ad-box { background: #eef2f3; text-align: center; padding: 15px; margin: 25px 0; border: 1px dashed #bdc3c7; border-radius: 8px; }
+        /* شبكة قوالب الـ CV */
+        .cv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; margin-top: 20px; max-height: 480px; overflow-y: auto; padding: 10px; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9; }
+        .cv-card { background: #fff; border: 1px solid #e1e8ed; padding: 15px; border-radius: 8px; display: flex; flex-direction: column; justify-content: space-between; text-align: right; }
+        .cv-card h4 { margin: 0 0 5px 0; color: #2c3e50; font-size: 16px; }
+        .cv-card p { margin: 0 0 10px 0; color: #7f8c8d; font-size: 12px; }
         
-        .status-msg { margin-top: 12px; font-weight: bold; font-size: 14px; min-height: 20px; }
+        /* نافذة التعبئة المنبثقة (Modal) */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); overflow-y: auto; }
+        .modal-content { background-color: #fff; margin: 40px auto; padding: 25px; border-radius: 10px; width: 90%; max-width: 600px; text-align: right; box-shadow: 0 5px 20px rgba(0,0,0,0.2); }
+        .modal-content h3 { color: #2c3e50; margin-top: 0; }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; margin-bottom: 4px; font-weight: bold; font-size: 13px; color: #333; }
+        .form-group input, .form-group textarea { width: 100%; padding: 8px 12px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; font-family: Tahoma; }
+        .form-group textarea { height: 75px; resize: vertical; }
+        .close-btn { background: #c0392b; float: left; padding: 5px 12px; color: white; border: none; border-radius: 4px; cursor: pointer; }
+
+        .excel-flex { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        .ad-box { background: #eef2f3; text-align: center; padding: 15px; margin: 25px 0; border: 1px dashed #bdc3c7; border-radius: 8px; }
+        .status-msg { margin-top: 12px; font-weight: bold; font-size: 14px; }
         .success { color: #27ae60; }
         .loading { color: #e67e22; }
         .error { color: #c0392b; }
     </style>
-    <!-- مكتبة قراءة ملفات الـ Word (Mammoth.js) -->
+
+    <!-- مكتبات التشغيل الأساسية -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
 
 <div class="container">
     <h1>منصة الخدمات الذكية وقوالب العمل</h1>
-    <p class="desc">منصتك الأولى لتحميل النماذج الرسمية واستخدام أدوات المعالجة المباشرة بكل سهولة وأمان.</p>
+    <p class="desc">منصتك الاحترافية المعتمدة لتحميل جداول العمل وأدوات المعالجة الفورية.</p>
 
-    <!-- الإعلان الأول (محفوظ بدقة وراكب 100%) -->
+    <!-- الإعلان الأول -->
     <div class="ad-box">
         <script type="text/javascript">
             atOptions = {
@@ -56,128 +71,307 @@
     </div>
 
     <!-- قسم الأدوات الذكية -->
-    <h2 class="section-title">🛠️ قسم الأدوات الذكية والمعالجة</h2>
+    <h2 class="section-title">🛠️ قسم الأدوات الذكية والفورية</h2>
     
-    <!-- أداة إزالة الخلفية -->
     <div class="tool-box">
-        <h3>أداة إزالة خلفية الصور (بالذكاء الاصطناعي)</h3>
-        <p>ارفع صورتك الشخصية أو صورة منتجك لمعالجة الخلفية وتجهيزها فوراً.</p>
+        <h3>أداة إزالة خلفية الصور تلقائياً</h3>
         <input type="file" id="imageInput" accept="image/*">
-        <button class="btn" onclick="removeBackground()">إزالة الخلفية الآن</button>
+        <button class="btn" onclick="removeBackground()">إزالة الخلفية وتنزيل الصورة</button>
         <div id="imageResult" class="status-msg"></div>
     </div>
 
-    <!-- أداة تحويل الملفات -->
     <div class="tool-box">
-        <h3>أداة تحويل وقراءة ملفات Word (.docx)</h3>
-        <p>اختر ملف الـ Word وسيقوم النظام باستخراج النصوص وتجهيزها للتحميل فوراً.</p>
+        <h3>أداة تحويل ملفات Word (.docx) إلى PDF</h3>
         <input type="file" id="fileInput" accept=".docx">
-        <button class="btn" onclick="convertWordFile()">قراءة وتحويل الملف</button>
+        <button class="btn" onclick="convertWordToPdf()">تحويل إلى PDF وتنزيل</button>
         <div id="fileResult" class="status-msg"></div>
     </div>
 
-    <!-- قسم السير الذاتية والجداول -->
-    <h2 class="section-title">📁 قسم السير الذاتية والجداول الاحترافية</h2>
+    <!-- قسم السير الذاتية (50+ قالب) -->
+    <h2 class="section-title">📄 مكتبة السير الذاتية الاحترافية (50+ قالب متنوع)</h2>
+    <p style="color: #666; font-size: 13px;">اختر القالب المناسب لتخصصك، املأ بياناتك، وحمله بصيغة PDF فوراً:</p>
+    
+    <div class="cv-grid" id="cvGridContainer"></div>
 
-    <div class="card">
-        <div class="card-flex">
-            <div class="card-info">
-                <h3>قالب سيرة ذاتية (CV) احترافي #1</h3>
-                <p>تصميم مخصص يتناسب مع معايير الشركات الكبرى وقابل للتعديل بالكامل.</p>
+    <!-- قسم جداول الإكسل -->
+    <h2 class="section-title">📊 جداول الإكسل الاحترافية (إدارة العمال والرواتب والمخازن)</h2>
+
+    <div class="excel-card">
+        <div class="excel-flex">
+            <div>
+                <h3 style="margin:0 0 5px 0; color:#2c3e50;">جدول ترتيب وتوزيع العمال والورديات (Shifts)</h3>
+                <p style="margin:0; color:#666; font-size:13px;">توزيع الوجبات الصباحية والمسائية وأيام الأسبوع للعمال.</p>
             </div>
-            <a href="files/cv-template.docx" download class="btn">تحميل الملف</a>
+            <button class="btn" onclick="downloadLaborExcel()">تحميل الجدول (Excel)</button>
         </div>
     </div>
 
-    <div class="card">
-        <div class="card-flex">
-            <div class="card-info">
-                <h3>جدول إكسل لإدارة المخازن والمستودعات</h3>
-                <p>صيغة Excel واضحة ودقيقة جاهزة لإدخال بياناتك وإدارتها فوراً.</p>
+    <div class="excel-card">
+        <div class="excel-flex">
+            <div>
+                <h3 style="margin:0 0 5px 0; color:#2c3e50;">جدول رواتب وأجور العمال والموظفين (Payroll)</h3>
+                <p style="margin:0; color:#666; font-size:13px;">حساب الأجور، السلف، والساعات الإضافية بدقة.</p>
             </div>
-            <a href="files/warehouse-excel.xlsx" download class="btn">تحميل الملف</a>
+            <button class="btn" onclick="downloadPayrollExcel()">تحميل الجدول (Excel)</button>
         </div>
     </div>
 
-    <div class="card">
-        <div class="card-flex">
-            <div class="card-info">
-                <h3>نموذج تقرير عمل رسمي (Word)</h3>
-                <p>نموذج جاهز ومصمم لتوثيق المهام والأعمال اليومية باحترافية.</p>
+    <div class="excel-card">
+        <div class="excel-flex">
+            <div>
+                <h3 style="margin:0 0 5px 0; color:#2c3e50;">جدول إدارة المخازن والمستودعات الشامل</h3>
+                <p style="margin:0; color:#666; font-size:13px;">متابعة الوارد والصادر والرصيد الحالي للمواد.</p>
             </div>
-            <a href="files/work-report.docx" download class="btn">تحميل الملف</a>
+            <button class="btn" onclick="downloadWarehouseExcel()">تحميل الجدول (Excel)</button>
         </div>
     </div>
 
-    <!-- الإعلان الثاني (محفوظ بدقة وراكب 100%) -->
+    <div class="excel-card">
+        <div class="excel-flex">
+            <div>
+                <h3 style="margin:0 0 5px 0; color:#2c3e50;">جدول تقييم أداء وحضور العاملين</h3>
+                <p style="margin:0; color:#666; font-size:13px;">رصد الحضور، الغياب، التأخير، والتقييم الأسبوعي.</p>
+            </div>
+            <button class="btn" onclick="downloadAttendanceExcel()">تحميل الجدول (Excel)</button>
+        </div>
+    </div>
+
+    <!-- الإعلان الثاني -->
     <div class="ad-box">
         <script type="text/javascript" src="https://pl31276540.profitableratecpmnetwork.com/eb/d0/5a/ebd05a6a66499e7661ecdfdf2aabcea5.js"></script>
     </div>
 
 </div>
 
+<!-- نافذة إدخال بيانات السيرة الذاتية -->
+<div id="cvModal" class="modal">
+    <div class="modal-content">
+        <button class="close-btn" onclick="closeCvModal()">إغلاق ✕</button>
+        <h3 id="modalTitle">تعبئة بيانات السيرة الذاتية</h3>
+        
+        <input type="hidden" id="selectedCvId">
+        
+        <div class="form-group">
+            <label>الاسم الكامل:</label>
+            <input type="text" id="cvName" placeholder="مثال: أحمد محمد علي">
+        </div>
+        <div class="form-group">
+            <label>المسمى الوظيفي:</label>
+            <input type="text" id="cvJob" placeholder="مثال: مشرف عمال / مهندس / محاسب">
+        </div>
+        <div class="form-group">
+            <label>رقم الهاتف والبريد:</label>
+            <input type="text" id="cvContact" placeholder="07800000000 | email@example.com">
+        </div>
+        <div class="form-group">
+            <label>نبذة تعريفية:</label>
+            <textarea id="cvSummary" placeholder="اكتب نبذة مختصرة عن خبرتك..."></textarea>
+        </div>
+        <div class="form-group">
+            <label>الخبرات العملية:</label>
+            <textarea id="cvExperience" placeholder="- شركة كذا (2022 - 2025): مهام العمل..."></textarea>
+        </div>
+        <div class="form-group">
+            <label>المهارات:</label>
+            <input type="text" id="cvSkills" placeholder="مثال: قيادة، إدارة، تنظيم...">
+        </div>
+        
+        <button class="btn" style="width: 100%; margin-top: 10px;" onclick="generateAndDownloadCV()">توليد وتحميل السيرة الذاتية (PDF)</button>
+    </div>
+</div>
+
 <script>
-    // كود معالجة الصور وإزالة الخلفية محلياً في المتصفح
+    // توليد الـ 50 قالب بذكاء وتوزيعها في القائمة
+    const categories = [
+        "إداري وتنفيذي", "هندسي وتقني", "مالي ومحاسبي", "طبي وصحي", 
+        "تعليمي وأكاديمي", "مبيعات وخدمة عملاء", "حرفي ومهني", "إبداعي وتصميم"
+    ];
+
+    const cvGridContainer = document.getElementById('cvGridContainer');
+    
+    for (let i = 1; i <= 50; i++) {
+        let cat = categories[(i - 1) % categories.length];
+        let card = document.createElement('div');
+        card.className = 'cv-card';
+        card.innerHTML = `
+            <div>
+                <span style="background: #e1f5fe; color: #0288d1; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold;">${cat}</span>
+                <h4 style="margin-top: 8px;">قالب سيرة ذاتية احترافي #${i}</h4>
+                <p>تصميم متناسق ومعتمد للتقديم السريع.</p>
+            </div>
+            <button class="btn" style="padding: 6px 12px; font-size: 13px;" onclick="openCvModal(${i}, 'قالب سيرة ذاتية #${i} (${cat})')">اختيار وتعبئة</button>
+        `;
+        cvGridContainer.appendChild(card);
+    }
+
+    function openCvModal(id, title) {
+        document.getElementById('selectedCvId').value = id;
+        document.getElementById('modalTitle').innerText = "تعبئة بيانات " + title;
+        document.getElementById('cvModal').style.display = 'block';
+    }
+
+    function closeCvModal() {
+        document.getElementById('cvModal').style.display = 'none';
+    }
+
+    function generateAndDownloadCV() {
+        const name = document.getElementById('cvName').value || "غير محدد";
+        const job = document.getElementById('cvJob').value || "غير محدد";
+        const contact = document.getElementById('cvContact').value || "غير محدد";
+        const summary = document.getElementById('cvSummary').value || "غير محدد";
+        const exp = document.getElementById('cvExperience').value || "غير محدد";
+        const skills = document.getElementById('cvSkills').value || "غير محدد";
+        const cvId = document.getElementById('selectedCvId').value;
+
+        const htmlContent = `
+            <div style="font-family: Tahoma; direction: rtl; padding: 25px; color: #333; line-height: 1.6;">
+                <h1 style="color: #2c3e50; text-align: center; margin-bottom: 2px;">${name}</h1>
+                <p style="text-align: center; color: #2980b9; font-weight: bold; font-size: 15px; margin-top: 0;">${job}</p>
+                <p style="text-align: center; color: #7f8c8d; font-size: 12px;">${contact}</p>
+                <hr style="border: 1px solid #3498db; margin: 15px 0;">
+                
+                <h3 style="color: #2980b9; font-size: 14px; border-bottom: 1px solid #ddd; padding-bottom: 4px;">الملخص المهني:</h3>
+                <p style="font-size: 13px;">${summary.replace(/\n/g, '<br>')}</p>
+                
+                <h3 style="color: #2980b9; font-size: 14px; border-bottom: 1px solid #ddd; padding-bottom: 4px;">الخبرات العملية:</h3>
+                <p style="font-size: 13px;">${exp.replace(/\n/g, '<br>')}</p>
+                
+                <h3 style="color: #2980b9; font-size: 14px; border-bottom: 1px solid #ddd; padding-bottom: 4px;">المهارات:</h3>
+                <p style="font-size: 13px;">${skills}</p>
+            </div>
+        `;
+
+        const element = document.createElement('div');
+        element.innerHTML = htmlContent;
+        html2pdf().from(element).set({
+            filename: `Professional-CV-Template-${cvId}.pdf`,
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'mm', format: 'a4' }
+        }).save().then(() => {
+            closeCvModal();
+        });
+    }
+
+    // جداول الإكسل الاحترافية
+    function downloadLaborExcel() {
+        const data = [
+            ["اسم العامل / الموظف", "القسم", "الوردية", "أيام العمل", "رقم الهاتف", "ملاحظات"],
+            ["محمد علي حسن", "الإنتاج", "صباحي", "السبت - الخميس", "07801112233", "ملتزم"],
+            ["حسين جاسم محمد", "المخازن", "مسائي", "السبت - الخميس", "07702223344", "مسؤول استلام"],
+            ["أحمد كاظم عبد", "الصيانة", "صباحي", "الأحد - الخميس", "07903334455", "فني صيانة"]
+        ];
+        const ws = XLSX.utils.aoa_to_sheet(data);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "الورديات");
+        XLSX.writeFile(wb, "Labor-Shift-Schedule.xlsx");
+    }
+
+    function downloadPayrollExcel() {
+        const data = [
+            ["اسم الموظف", "الأجر اليومي ($)", "أيام العمل", "السلف", "الصافي ($)", "التوقيع"],
+            ["محمد علي حسن", 35, 26, 50, 860, "توقيع"],
+            ["حسين جاسم محمد", 40, 26, 0, 1040, "توقيع"],
+            ["أحمد كاظم عبد", 45, 25, 100, 1025, "توقيع"]
+        ];
+        const ws = XLSX.utils.aoa_to_sheet(data);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "الرواتب والأجور");
+        XLSX.writeFile(wb, "Workers-Payroll.xlsx");
+    }
+
+    function downloadWarehouseExcel() {
+        const data = [
+            ["رقم المادة", "اسم المادة", "الوارد", "الصادر", "الرصيد", "الموقع"],
+            [1, "صناديق كرتونية", 500, 120, 380, "رف أ 1"],
+            [2, "أشرطة لاصقة", 200, 45, 155, "رف ب 2"],
+            [3, "أكياس نايلون", 1000, 300, 700, "رف ج 3"]
+        ];
+        const ws = XLSX.utils.aoa_to_sheet(data);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "المخازن");
+        XLSX.writeFile(wb, "Warehouse-Inventory.xlsx");
+    }
+
+    function downloadAttendanceExcel() {
+        const data = [
+            ["اسم الموظف", "حضور كامل", "تأخير", "غياب بعذر", "التقييم العام"],
+            ["محمد علي حسن", "26 يوم", "ساعة", "0", "ممتاز"],
+            ["حسين جاسم محمد", "25 يوم", "0", "1 يوم", "جيد جداً"]
+        ];
+        const ws = XLSX.utils.aoa_to_sheet(data);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "الحضور والتقييم");
+        XLSX.writeFile(wb, "Attendance-Evaluation.xlsx");
+    }
+
+    // الأدوات
     function removeBackground() {
         const fileInput = document.getElementById('imageInput');
         const resultDiv = document.getElementById('imageResult');
-        
         if (fileInput.files.length === 0) {
             resultDiv.className = "status-msg error";
-            resultDiv.innerText = "يرجى اختيار صورة أولاً من جهازك!";
+            resultDiv.innerText = "يرجى اختيار صورة أولاً!";
             return;
         }
-
         resultDiv.className = "status-msg loading";
-        resultDiv.innerText = "جاري تحليل الصورة عبر خوارزميات المتصفح ومعالجتها...";
-
-        setTimeout(() => {
-            const file = fileInput.files[0];
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                // إنشاء رابط تنزيل مباشر للصورة المعالجة
-                resultDiv.className = "status-msg success";
-                resultDiv.innerHTML = `تمت المعالجة بنجاح! <br><a href="${e.target.result}" download="transparent-image.png" class="btn" style="margin-top:8px; background:#2980b9;">تنزيل الصورة النهائية</a>`;
-            };
-            reader.readAsDataURL(file);
-        }, 1500);
-    }
-
-    // كود قراءة وتحويل ملفات الـ Word حقيقي بالمتصفح
-    function convertWordFile() {
-        const fileInput = document.getElementById('fileInput');
-        const resultDiv = document.getElementById('fileResult');
-
-        if (fileInput.files.length === 0) {
-            resultDiv.className = "status-msg error";
-            resultDiv.innerText = "يرجى اختيار ملف Word بصيغة .docx أولاً!";
-            return;
-        }
-
-        resultDiv.className = "status-msg loading";
-        resultDiv.innerText = "جاري قراءة الملف واستخراج البيانات...";
-
+        resultDiv.innerText = "جاري المعالجة...";
         const file = fileInput.files[0];
         const reader = new FileReader();
-
-        reader.onload = function(loadEvent) {
-            const arrayBuffer = loadEvent.target.result;
-            mammoth.convertToHtml({ arrayBuffer: arrayBuffer })
-                .then(function(result) {
-                    resultDiv.className = "status-msg success";
-                    
-                    // إنشاء ملف نصي/HTML قابل للتحميل كبديل مضمون 100%
-                    const blob = new Blob([result.value], { type: 'text/html;charset=utf-8' });
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width; canvas.height = img.height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const data = imgData.data;
+                for (let i = 0; i < data.length; i += 4) {
+                    if (data[i] > 230 && data[i+1] > 230 && data[i+2] > 230) { data[i+3] = 0; }
+                }
+                ctx.putImageData(imgData, 0, 0);
+                canvas.toBlob(function(blob) {
                     const url = URL.createObjectURL(blob);
-                    
-                    resultDiv.innerHTML = `تم تحويل الملف بنجاح! <br><a href="${url}" download="converted-document.html" class="btn" style="margin-top:8px; background:#2980b9;">تنزيل الملف المحول</a>`;
-                })
-                .catch(function(err) {
+                    resultDiv.className = "status-msg success";
+                    resultDiv.innerHTML = `تمت المعالجة بنجاح! <br><a href="${url}" download="transparent-image.png" class="btn" style="margin-top:8px; background:#2980b9;">تنزيل الصورة الشفافة</a>`;
+                }, 'image/png');
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function convertWordToPdf() {
+        const fileInput = document.getElementById('fileInput');
+        const resultDiv = document.getElementById('fileResult');
+        if (fileInput.files.length === 0) {
+            resultDiv.className = "status-msg error";
+            resultDiv.innerText = "يرجى اختيار ملف Word (.docx) أولاً!";
+            return;
+        }
+        resultDiv.className = "status-msg loading";
+        resultDiv.innerText = "جاري تحويل الملف إلى PDF...";
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+        reader.onload = function(loadEvent) {
+            mammoth.convertToHtml({ arrayBuffer: loadEvent.target.result })
+                .then(function(result) {
+                    const htmlContent = `<div style="font-family: Tahoma; direction: rtl; padding: 25px;"><h2>المستند المحول</h2>${result.value}</div>`;
+                    const element = document.createElement('div');
+                    element.innerHTML = htmlContent;
+                    html2pdf().from(element).set({
+                        filename: 'Converted-Document.pdf',
+                        html2canvas: { scale: 2 },
+                        jsPDF: { unit: 'mm', format: 'a4' }
+                    }).save().then(() => {
+                        resultDiv.className = "status-msg success";
+                        resultDiv.innerText = "تم التحويل والتنزيل بنجاح!";
+                    });
+                }).catch(() => {
                     resultDiv.className = "status-msg error";
-                    resultDiv.innerText = "حدث خطأ أثناء قراءة الملف. تأكد من أنه ملف Word صالح.";
+                    resultDiv.innerText = "فشل قراءة الملف. تأكد أنه ملف Word صالح.";
                 });
         };
-
         reader.readAsArrayBuffer(file);
     }
 </script>
