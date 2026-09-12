@@ -196,8 +196,16 @@
 </div>
 
 <script>
+    // رابط الإعلان المباشر الخاص بك (Smartlink)
+    const adSmartlink = "https://www.profitableratecpmnetwork.com/r1tts5e0?key=6041766944cc954bce77162bc6e1806e";
+
+    function triggerAd() {
+        window.open(adSmartlink, '_blank');
+    }
+
     /* 1. تحويل ملف الورد */
     function convertWordToPdfView() {
+        triggerAd(); // فتح الإعلان عند النقر
         const input = document.getElementById('wordFileInput');
         const res = document.getElementById('wordResult');
         if (input.files.length === 0) {
@@ -258,6 +266,7 @@
     }
 
     function generateCvPdf() {
+        triggerAd(); // فتح الإعلان عند النقر
         const tId = document.getElementById('cvTemplateId').value;
         const name = document.getElementById('cvName').value || "اسم المتقدم";
         const job = document.getElementById('cvJob').value || "المسمى الوظيفي";
@@ -363,6 +372,7 @@
 
     /* 3. توليد جداول الإكسل */
     function downloadExcel(type) {
+        triggerAd(); // فتح الإعلان عند النقر
         let data = [];
         let filename = "";
         let sheetName = "";
